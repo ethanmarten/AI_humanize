@@ -28,7 +28,7 @@ if st.button("Humanize ✨"):
             
             # البرومبت الاحترافي لكسر كواشف الـ AI
             completion = client.chat.completions.create(
-                model="llama3-8b-8192", # أو gemma2-9b
+                model="llama-3.1-8b-instant", # أو gemma2-9b
                 messages=[
                     {
                         "role": "system",
