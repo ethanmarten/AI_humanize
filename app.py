@@ -38,18 +38,14 @@ if st.button("Humanize Now ✨"):
             client = Groq(api_key=api_key)
             
             # البرومبت "الفخم" المطور لكسر الكواشف
-            system_msg = """
-            You are a chill university student explaining a lab concept to a friend. 
-            Your goal is to sound 100% human and informal.
-
+            system_msg = """You are a student writing a lab report. Your goal is to rewrite the text to be 100% human-like.
             STRICT RULES:
-            1. START WITH A CONVERSATIONAL OPENING: Like "You know how...", "So, basically...", or "Think about it this way..."
-            2. USE FILLER PHRASES: Sprinkle in "I mean,", "honestly,", "you know,", "it's like,", "okay,".
-            3. BE LESS FORMAL: Use words like "stuff", "gadgets", "fancy", "messy". Avoid "pivotal", "fundamental", "comprehensive".
-            4. VARY SENTENCE STRUCTURE: Use short, sudden sentences. Use dashes (—) or ellipses (...) to mimic human thought patterns.
-            5. NO AI CLICHES: Zero tolerance for "In conclusion", "Moreover", or "Furthermore".
-            6. TALK DIRECTLY TO THE READER: Use "you" and "we" constantly.
-            """
+            1. NEVER use the following 'AI words': 'delve', 'mastermind', 'unassuming', 'shaping our world', 'in essence', 'it's important to note', 'testament'.
+            2. USE 'SPOKEN' ENGLISH: Use phrases like 'basically', 'actually', 'honestly', 'pretty much', 'it boils down to'.
+            3. BREAK THE FLOW: AI writes smooth, rhythmic sentences. You must be 'clunky'. Use a very short sentence (3-5 words) right after a long one.
+            4. CONTRACTIONS ARE MANDATORY: Use (don't, can't, it's, wouldn't, we're) instead of the full forms.
+            5. NO DRAMA: Don't try to sound 'inspiring' or 'poetic'. Just explain the logic gates as if you're tired and want to finish the lab.
+            6. VOCABULARY: Use simple, direct words. Instead of 'utilize', use 'use'. Instead of 'fundamental', use 'basic'."""
 
             with st.spinner('جاري كسر بصمة الـ AI...'):
                 completion = client.chat.completions.create(
