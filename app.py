@@ -1,10 +1,10 @@
 import streamlit as st
 from groq import Groq
 
-# إعدادات الصفحة
+# إعدادات الصفحة بستايل إيثان المفضل
 st.set_page_config(page_title="AI Humanizer Elite Pro", page_icon="✍️")
 
-# CSS يدعم اللغتين وتنسيق RTL/LTR تلقائي
+# CSS يدعم اللغتين وتنسيق احترافي
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Inter:wght@400;600&display=swap');
@@ -13,7 +13,6 @@ st.markdown("""
         font-family: 'Cairo', 'Inter', sans-serif;
     }
     
-    /* تنسيق صندوق النص ليدعم الاتجاهين */
     .stTextArea textarea { 
         border-radius: 15px; 
         border: 1px solid #d4af37; 
@@ -24,69 +23,58 @@ st.markdown("""
     
     .stButton>button { 
         background: linear-gradient(45deg, #d4af37, #b8860b); 
-        color: white; border-radius: 25px; padding: 10px 25px; transition: 0.3s;
-        width: 100%;
-        font-weight: bold;
+        color: white; border-radius: 25px; padding: 10px 25px; 
+        width: 100%; font-weight: bold;
     }
-    .stButton>button:hover { transform: scale(1.02); box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4); }
     </style>
     """, unsafe_allow_html=True)
 
 st.title("✨ AI Humanizer Elite Pro")
-st.write("حول تقاريرك الجامعية (عربي/إنجليزي) لنصوص بشرية 100%.")
+st.write("حول نصوصك الأكاديمية (عربي/إنجليزي) لأسلوب بشري 100% يصعب كشفه.")
 
-# الجانب الجانبي
 with st.sidebar:
-    st.header("⚙️ Settings / الإعدادات")
-    api_key = st.text_input("Enter Groq API Key:", type="password")
-    model_name = st.selectbox("Select Model:", ["llama-3.1-8b-instant", "llama-3.3-70b-versatile"])
-    intensity = st.slider("Humanization Intensity / قوة التحويل:", 0.7, 1.5, 1.2)
+    st.header("⚙️ الإعدادات")
+    api_key = st.text_input("أدخل Groq API Key:", type="password")
+    model_name = st.selectbox("النموذج:", ["llama-3.1-8b-instant", "llama-3.3-70b-versatile"])
+    intensity = st.slider("قوة التحويل (Intensity):", 0.7, 1.5, 1.3) # رفعنا الافتراضي لـ 1.3 لنتائج أقوى
 
-input_text = st.text_area("أدخل النص هنا (عربي أو إنجليزي):", height=250, placeholder="Paste your AI text here...")
+input_text = st.text_area("أدخل النص هنا:", height=250, placeholder="ضع النص هنا...")
 
-if st.button("Humanize Now / حول النص الآن ✨"):
+if st.button("تحويل النص الآن ✨"):
     if not api_key:
         st.error("الرجاء إدخال API Key.")
     elif not input_text:
-        st.warning("الرجاء إدخال نص أولاً.")
+        st.warning("الرجاء إدخال نص.")
     else:
         try:
             client = Groq(api_key=api_key)
             
-            # البرومبت "الجوهري" الذي يدمج اللغتين وقواعد كسر الـ AI
-            system_msg = """You are a bilingual professional human editor. 
-            Your goal is to rewrite the input (whether in Arabic or English) to be 100% human-like and bypass AI detectors.
+            # البرومبت اللي جاب نتيجة 0% و 17% اللي جربناهم
+            system_msg = """You are a student explaining a concept to a peer. Your goal is to be 100% human and pass AI detection.
 
-            GENERAL RULES (For both languages):
-            1. NO AI CLICHES: In English, avoid 'delve', 'moreover', 'testament'. In Arabic, avoid 'علاوة على ذلك', 'في جوهره', 'يعد هذا'.
-            2. VARY SENTENCE LENGTH: Use the 'Short-Long-Short' technique. Break the smooth flow.
-            3. BE DIRECT: Use 'spoken' language (Contractions in English like "don't"; Informal links in Arabic like "ببساطة").
-            4. TONE: Write as a smart student explaining to a friend. Be slightly informal but keep the technical meaning.
-            5. STRUCTURE: Avoid perfect symmetry. Humans are 'messy' writers.
-            
-            [IF INPUT IS ARABIC]: Use 'White Arabic' (simple Fusha). Use words like 'بصراحة', 'يعني', 'الفكرة إنو'.
-            [IF INPUT IS ENGLISH]: Use contractions (it's, we're), simple vocabulary (use 'buy' instead of 'purchase'), and punchy sentences."""
+            RULES:
+            1. Language: Use simple, everyday language (White Arabic or Conversational English).
+            2. Anti-AI Cliches: NEVER use words like 'furthermore', 'delve', 'moreover' in English, or 'علاوة على ذلك', 'في جوهره' in Arabic.
+            3. Conversational Markers: Use filler phrases. (English: "honestly", "basically", "so yeah"). (Arabic: "بصراحة", "الفكرة إنو", "ببساطة").
+            4. Sentence Variety: Use a very short sentence immediately after a long one.
+            5. Tone: Sound a bit tired or informal, like a real student, not a professor. 
+            6. Structure: Be slightly 'messy'. Don't be too organized or overly logical.
+            """
 
             with st.spinner('جاري معالجة النص...'):
                 completion = client.chat.completions.create(
                     model=model_name,
                     messages=[
                         {"role": "system", "content": system_msg},
-                        {"role": "user", "content": f"Rewrite this text to be human-like. Keep the original language and meaning: {input_text}"}
+                        {"role": "user", "content": f"Humanize this text while keeping the exact technical meaning: {input_text}"}
                     ],
                     temperature=intensity,
-                    top_p=0.9,
-                    max_tokens=2048
+                    top_p=0.9
                 )
                 
-                result = completion.choices[0].message.content
-                
                 st.markdown("---")
-                st.subheader("✅ النتيجة النهائية:")
-                st.write(result)
+                st.subheader("✅ النتيجة البشرية:")
+                st.write(completion.choices[0].message.content)
                 
         except Exception as e:
             st.error(f"حدث خطأ: {str(e)}")
-
-st.markdown("---")
-st.info("نصيحة: إذا كان النص تقنياً جداً، يفضل اختيار Intensity حول 1.3 للحصول على أفضل تباين بشري.")
