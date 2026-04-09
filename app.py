@@ -1,60 +1,80 @@
 import streamlit as st
 from groq import Groq
 
-# إعدادات الصفحة بستايل احترافي وبسيط
-st.set_page_config(page_title="AI Humanizer Elite", page_icon="✍️")
+# إعدادات الصفحة
+st.set_page_config(page_title="AI Humanizer Elite Pro", page_icon="✍️")
 
-# CSS لتحسين المظهر
+# CSS يدعم اللغتين وتنسيق RTL/LTR تلقائي
 st.markdown("""
     <style>
-    .stTextArea textarea { border-radius: 15px; border: 1px solid #d4af37; background-color: #1a1a1a; color: white; }
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Inter:wght@400;600&display=swap');
+    
+    html, body, .stMarkdown, .stTextArea textarea {
+        font-family: 'Cairo', 'Inter', sans-serif;
+    }
+    
+    /* تنسيق صندوق النص ليدعم الاتجاهين */
+    .stTextArea textarea { 
+        border-radius: 15px; 
+        border: 1px solid #d4af37; 
+        background-color: #1a1a1a; 
+        color: white;
+        direction: auto; 
+    }
+    
     .stButton>button { 
         background: linear-gradient(45deg, #d4af37, #b8860b); 
         color: white; border-radius: 25px; padding: 10px 25px; transition: 0.3s;
+        width: 100%;
+        font-weight: bold;
     }
     .stButton>button:hover { transform: scale(1.02); box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4); }
     </style>
     """, unsafe_allow_html=True)
 
-st.title("✨ AI Humanizer Elite")
-st.write("حول تقاريرك الجامعية لنصوص تبدو بشرية 100% (محسّن لـ Llama 3.1)")
+st.title("✨ AI Humanizer Elite Pro")
+st.write("حول تقاريرك الجامعية (عربي/إنجليزي) لنصوص بشرية 100%.")
 
-# الجانب الجانبي للإعدادات
+# الجانب الجانبي
 with st.sidebar:
-    st.header("⚙️ Settings")
+    st.header("⚙️ Settings / الإعدادات")
     api_key = st.text_input("Enter Groq API Key:", type="password")
     model_name = st.selectbox("Select Model:", ["llama-3.1-8b-instant", "llama-3.3-70b-versatile"])
-    intensity = st.slider("Humanization Intensity:", 0.7, 1.5, 1.2)
+    intensity = st.slider("Humanization Intensity / قوة التحويل:", 0.7, 1.5, 1.2)
 
-input_text = st.text_area("أدخل نص الـ AI هنا:", height=250, placeholder="Paste your lab introduction or essay here...")
+input_text = st.text_area("أدخل النص هنا (عربي أو إنجليزي):", height=250, placeholder="Paste your AI text here...")
 
-if st.button("Humanize Now ✨"):
+if st.button("Humanize Now / حول النص الآن ✨"):
     if not api_key:
-        st.error("الرجاء إدخال API Key الخاص بك.")
+        st.error("الرجاء إدخال API Key.")
     elif not input_text:
-        st.warning("أدخل نصاً أولاً!")
+        st.warning("الرجاء إدخال نص أولاً.")
     else:
         try:
             client = Groq(api_key=api_key)
             
-            # البرومبت "الفخم" المطور لكسر الكواشف
-            system_msg = """You are a student writing a lab report. Your goal is to rewrite the text to be 100% human-like.
-            STRICT RULES:
-            1. NEVER use the following 'AI words': 'delve', 'mastermind', 'unassuming', 'shaping our world', 'in essence', 'it's important to note', 'testament'.
-            2. USE 'SPOKEN' ENGLISH: Use phrases like 'basically', 'actually', 'honestly', 'pretty much', 'it boils down to'.
-            3. BREAK THE FLOW: AI writes smooth, rhythmic sentences. You must be 'clunky'. Use a very short sentence (3-5 words) right after a long one.
-            4. CONTRACTIONS ARE MANDATORY: Use (don't, can't, it's, wouldn't, we're) instead of the full forms.
-            5. NO DRAMA: Don't try to sound 'inspiring' or 'poetic'. Just explain the logic gates as if you're tired and want to finish the lab.
-            6. VOCABULARY: Use simple, direct words. Instead of 'utilize', use 'use'. Instead of 'fundamental', use 'basic'."""
+            # البرومبت "الجوهري" الذي يدمج اللغتين وقواعد كسر الـ AI
+            system_msg = """You are a bilingual professional human editor. 
+            Your goal is to rewrite the input (whether in Arabic or English) to be 100% human-like and bypass AI detectors.
 
-            with st.spinner('جاري كسر بصمة الـ AI...'):
+            GENERAL RULES (For both languages):
+            1. NO AI CLICHES: In English, avoid 'delve', 'moreover', 'testament'. In Arabic, avoid 'علاوة على ذلك', 'في جوهره', 'يعد هذا'.
+            2. VARY SENTENCE LENGTH: Use the 'Short-Long-Short' technique. Break the smooth flow.
+            3. BE DIRECT: Use 'spoken' language (Contractions in English like "don't"; Informal links in Arabic like "ببساطة").
+            4. TONE: Write as a smart student explaining to a friend. Be slightly informal but keep the technical meaning.
+            5. STRUCTURE: Avoid perfect symmetry. Humans are 'messy' writers.
+            
+            [IF INPUT IS ARABIC]: Use 'White Arabic' (simple Fusha). Use words like 'بصراحة', 'يعني', 'الفكرة إنو'.
+            [IF INPUT IS ENGLISH]: Use contractions (it's, we're), simple vocabulary (use 'buy' instead of 'purchase'), and punchy sentences."""
+
+            with st.spinner('جاري معالجة النص...'):
                 completion = client.chat.completions.create(
                     model=model_name,
                     messages=[
                         {"role": "system", "content": system_msg},
-                        {"role": "user", "content": f"Rewrite this, making it sound natural and human. Keep the same meaning: {input_text}"}
+                        {"role": "user", "content": f"Rewrite this text to be human-like. Keep the original language and meaning: {input_text}"}
                     ],
-                    temperature=intensity, # تحكم في العشوائية من الـ Slider
+                    temperature=intensity,
                     top_p=0.9,
                     max_tokens=2048
                 )
@@ -62,12 +82,11 @@ if st.button("Humanize Now ✨"):
                 result = completion.choices[0].message.content
                 
                 st.markdown("---")
-                st.subheader("✅ النتيجة البشرية:")
+                st.subheader("✅ النتيجة النهائية:")
                 st.write(result)
-                st.caption("نصيحة: إذا كانت النسبة لا تزال عالية، ارفع الـ Intensity قليلاً وأعد المحاولة.")
-
+                
         except Exception as e:
-            st.error(f"حدث خطأ تقني: {str(e)}")
+            st.error(f"حدث خطأ: {str(e)}")
 
 st.markdown("---")
-st.info("هذه الأداة صممت لأغراض تعليمية لمساعدة الطلاب على تحسين أسلوب كتابتهم.")
+st.info("نصيحة: إذا كان النص تقنياً جداً، يفضل اختيار Intensity حول 1.3 للحصول على أفضل تباين بشري.")
