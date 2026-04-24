@@ -67,7 +67,7 @@ if st.button("تحويل النص الآن ✨"):
                 - Avoid academic clichés and 'perfect' formatting. 
                 - Sound tired but smart, like a student who just finished a long lab session."""
 
-           elif mode == "Professional":
+            elif mode == "Professional":
                 system_msg = """You are a professional Academic Engineer writing a formal lab report.
                 - Use precise technical terminology and formal structure.
                 - Maintain an objective, clear, and authoritative tone.
