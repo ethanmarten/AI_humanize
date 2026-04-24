@@ -44,7 +44,7 @@ with st.sidebar:
     model_name = st.selectbox("النموذج:", ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"])
     
     # اختيار نوع التقرير
-    mode = st.radio("اختر نمط الكتابة:", ["بشري عفوي (Student Mode)", "تقرير رسمي (Formal Lab Report)"])
+    mode = st.radio("اختر وضع التعديل:", ["Creative", "Professional", "Scientific/Technical Summary"])
     
     intensity = st.slider("قوة التحويل (Temperature):", 0.7, 1.5, 1.1)
 
@@ -60,17 +60,28 @@ if st.button("تحويل النص الآن ✨"):
             client = Groq(api_key=api_key)
             
             # تحديد البرومبت بناءً على النمط المختار
-            if mode == "بشري عفوي (Student Mode)":
+            if mode == "Creative":
                 system_msg = """You are a student explaining a concept to a friend. 
-                - Be informal, use fillers like 'honestly', 'basically', 'so yeah'.
-                - Use a bit of 'messy' structure. 
-                - Avoid academic cliches. Sound tired but smart."""
-            else:
+                - Be informal, use natural fillers like 'honestly', 'basically', 'so yeah'.
+                - Use a slightly messy, non-linear structure to mimic human thought. 
+                - Avoid academic clichés and 'perfect' formatting. 
+                - Sound tired but smart, like a student who just finished a long lab session."""
+
+           elif mode == "Professional":
                 system_msg = """You are a professional Academic Engineer writing a formal lab report.
-                - Use precise technical terminology.
-                - Maintain a professional, objective, and clear tone.
-                - Structure the information logically without being robotic.
-                - Avoid personal pronouns and conversational fillers."""
+                - Use precise technical terminology and formal structure.
+                - Maintain an objective, clear, and authoritative tone.
+                - Focus on 'why' and 'how' without using robotic transition words (like: Furthermore, Moreover).
+                - Ensure the flow is logical but sounds like it was written by a human expert, not a template."""
+
+           elif mode == "Scientific/Technical Summary":
+                system_msg = """You are a Computer Science student writing a summary for a Lab Report.
+                - Your goal is to bypass AI detectors by using 'Perplexity' and 'Burstiness'.
+                - Use a mix of first-person plural ('We implemented', 'We observed') and technical descriptions.
+                - Vary the sentence length: follow a long technical explanation with a short, direct observation.
+                - Explain the logic behind the code (e.g., 'To handle the digits, we used the % operator') instead of just describing the syntax.
+                - Avoid 'perfect' lists; use natural paragraphs with embedded technical details.
+                - Sound like an engineering student from IUG who deeply understands the logic but writes in a personal, academic style."""
 
             with st.spinner('جاري معالجة النص...'):
                 completion = client.chat.completions.create(
