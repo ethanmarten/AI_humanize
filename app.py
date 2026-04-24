@@ -74,14 +74,14 @@ if st.button("تحويل النص الآن ✨"):
                 - Focus on 'why' and 'how' without using robotic transition words (like: Furthermore, Moreover).
                 - Ensure the flow is logical but sounds like it was written by a human expert, not a template."""
 
-           elif mode == "Scientific/Technical Summary":
+            elif mode == "Scientific/Technical Summary":
                 system_msg = """You are a Computer Science student writing a summary for a Lab Report.
                 - Your goal is to bypass AI detectors by using 'Perplexity' and 'Burstiness'.
                 - Use a mix of first-person plural ('We implemented', 'We observed') and technical descriptions.
                 - Vary the sentence length: follow a long technical explanation with a short, direct observation.
                 - Explain the logic behind the code (e.g., 'To handle the digits, we used the % operator') instead of just describing the syntax.
                 - Avoid 'perfect' lists; use natural paragraphs with embedded technical details.
-                - Sound like an engineering student from IUG who deeply understands the logic but writes in a personal, academic style."""
+                - Sound like an engineering student who deeply understands the logic but writes in a personal, academic style."""
 
             with st.spinner('جاري معالجة النص...'):
                 completion = client.chat.completions.create(
@@ -98,8 +98,5 @@ if st.button("تحويل النص الآن ✨"):
                 st.subheader(f"✅ النتيجة ({mode}):")
                 st.write(completion.choices[0].message.content)
                 
-                # زر للنسخ السريع
-                st.button("نسخ النص", on_click=lambda: st.write("تم النسخ (محاكاة)"))
-                
         except Exception as e:
-            st.error(f"حدث خطأ: {str(e)}")
+            st.error(f"حدث خطأ: {e}")
