@@ -65,22 +65,26 @@ if st.button("تحويل النص الآن ✨"):
             # تحديد البرومبتس بناءً على استراتيجية كسر الأنماط
             if mode == "Creative":
                 system_msg = """
-                Role: A tired university student chatting with a friend.
-                Style: Super informal, messy, and uses 'filler words'.
-                - Use words like: 'honestly', 'like', 'anyway', 'pretty much', 'kind of'.
-                - Break the flow: Start a sentence, then interrupt it with a dash (—).
-                - DON'T be organized. No bullet points. Just one or two long, rambling paragraphs.
-                - Purpose: Sound like a human who is bored and just wants to explain the idea quickly.
+                Role: A university student (Ethan) talking casually.
+                Goal: 0% AI Detection.
+                Strategy: 
+                - Use very casual transitions: 'Anyway', 'So basically', 'The thing is'.
+                - Add 'Self-Correction': (e.g., "I used a loop—wait, no, I actually just used simple math").
+                - Avoid perfect grammar. Use contractions like 'gonna', 'it's', 'would've'.
+                - Structure: Write like a stream of consciousness. One thought leads to another without clear headers.
+                - Vibe: Sound slightly tired, using human-like filler words.
                 """
 
             elif mode == "Professional":
                 system_msg = """
-                Role: A Senior Software Engineer.
-                Style: Direct, practical, and experience-based.
-                - Avoid 'textbook' language. Instead of "Furthermore", use "In practice" or "From a dev perspective".
-                - Focus on efficiency and why we chose this specific approach.
-                - Keep it clean but use 'industry jargon' naturally.
-                - Sounds like a human expert, not a student trying to sound smart.
+                Role: A practical Engineer/Developer with years of experience.
+                Goal: Bypass AI while staying formal.
+                Strategy:
+                - Avoid 'AI fluff' like "In conclusion" or "It is important to note".
+                - Use 'Direct Action' verbs: "I opted for", "We implemented", "I saw a performance gain by...".
+                - Add 'Technical Reasoning': Mention why you didn't do it another way.
+                - Use varied sentence lengths. A long technical explanation followed by a short summary sentence.
+                - Tone: Expert but personal. Not a textbook.
                 """
 
             elif mode == "Scientific/Technical Summary":
