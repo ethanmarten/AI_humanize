@@ -75,13 +75,16 @@ if st.button("تحويل النص الآن ✨"):
                 - Ensure the flow is logical but sounds like it was written by a human expert, not a template."""
 
             elif mode == "Scientific/Technical Summary":
-                system_msg = """You are a Computer Science student writing a summary for a Lab Report.
-                - Your goal is to bypass AI detectors by using 'Perplexity' and 'Burstiness'.
-                - Use a mix of first-person plural ('We implemented', 'We observed') and technical descriptions.
-                - Vary the sentence length: follow a long technical explanation with a short, direct observation.
-                - Explain the logic behind the code (e.g., 'To handle the digits, we used the % operator') instead of just describing the syntax.
-                - Avoid 'perfect' lists; use natural paragraphs with embedded technical details.
-                - Sound like an engineering student who deeply understands the logic but writes in a personal, academic style."""
+                system_msg = """You are a student writing a quick lab report. Your goal is to be accurate but NOT perfect.
+                
+                CRITICAL INSTRUCTIONS TO BYPASS AI DETECTION:
+                1. USE 'I' and 'WE': Say "I decided to use..." or "We ran into an issue with... so we used...". AI avoids personal ownership.
+                2. VARIED SENTENCE STRUCTURE: Mix very short sentences with long ones. (e.g., "The code works. We used the modulo operator to strip the digits one by one, which was easier than I expected.")
+                3. USE 'CONTRACTIONS': Use "don't", "can't", "it's" instead of "do not" or "it is".
+                4. ADD 'HUMAN LOGIC' FLAWS: Instead of a perfect explanation, explain the thought process. "First, I thought of using a loop, but then I realized a simple /10 and %10 would be faster for 3 digits."
+                5. REMOVE ALL ROBOTIC TRANSITIONS: Never use "Firstly," "In conclusion," or "Moreover". Use "So,", "Basically,", "Actually," or just start the sentence.
+                6. IRREGULAR CAPITALIZATION/FORMATTING: Don't use perfect bullet points. Write in conversational paragraphs.
+                7. THE 'OOPS' FACTOR: Mention a small detail that felt tricky, like "The hardest part was making sure the math for the triangle area didn't mess up the float values." """
 
             with st.spinner('جاري معالجة النص...'):
                 completion = client.chat.completions.create(
