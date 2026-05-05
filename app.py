@@ -36,7 +36,7 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 st.title("✨ AI Humanizer Elite Pro")
-st.write("أداة إيثان الخاصة لتحويل النصوص إلى أسلوب بشري مع التحكم الكامل في الطول.")
+st.write("أداة إيثان الخاصة لتحويل النصوص الأكاديمية إلى أسلوب بشري لا يمكن كشفه.")
 
 with st.sidebar:
     st.header("⚙️ الإعدادات التقنية")
@@ -48,84 +48,70 @@ with st.sidebar:
     
     st.markdown("---")
     st.header("📏 التحكم في الطول")
+    # إضافة خيار تحديد الطول
+    length_type = st.selectbox("تحديد الطول حسب:", ["تلقائي (نفس الأصل)", "عدد الكلمات", "عدد الجمل"])
     
-    # خيار لتحديد نوع القيد (كلمات أم جمل)
-    length_type = st.selectbox("القيد بناءً على:", ["عدد الكلمات", "عدد الجمل", "نفس طول النص الأصلي"])
-    
-    length_val = 0
-    if length_type != "نفس طول النص الأصلي":
-        length_val = st.number_input(f"أدخل {length_type} المطلوب:", min_value=10, max_value=2000, value=150)
+    target_length = ""
+    if length_type != "تلقائي (نفس الأصل)":
+        val = st.number_input(f"أدخل {length_type} المطلوب:", min_value=5, value=100)
+        target_length = f"IMPORTANT: The output must be exactly around {val} {length_type.split()[-1]}."
 
     intensity = st.slider("قوة التحويل (Temperature):", 0.7, 1.5, 1.2)
     st.info("نصيحة: استخدم 1.2 للحصول على أقل نسبة كشف AI.")
 
-input_text = st.text_area("أدخل النص الأصلي هنا:", height=250, placeholder="ضع النص هنا...")
+input_text = st.text_area("أدخل النص الأكاديمي أو المسودة هنا:", height=250, placeholder="ضع النص هنا...")
 
 if st.button("تحويل النص الآن ✨"):
     if not api_key:
         st.error("الرجاء إدخال API Key.")
     elif not input_text:
-        st.warning("الرجاء إدخل نص.")
+        st.warning("الرجاء إدخال نص.")
     else:
         try:
             client = Groq(api_key=api_key)
             
-            # إعداد رسالة القيد للطول
-            if length_type == "عدد الكلمات":
-                length_instruction = f"The output must be approximately {length_val} words long."
-            elif length_type == "عدد الجمل":
-                length_instruction = f"The output must consist of exactly or very close to {length_val} sentences."
-            else:
-                length_instruction = "Keep the output length similar to the original text."
-
-            # البرومبتس
+            # تحديد البرومبتس بناءً على استراتيجية كسر الأنماط
             if mode == "Creative":
-                system_msg = """
+                system_msg = f"""
                 Role: A university student (Ethan) talking casually.
-                Goal: 0% AI Detection.
+                Goal: 0% AI Detection. {target_length}
                 Strategy: 
                 - Use very casual transitions: 'Anyway', 'So basically', 'The thing is'.
                 - Add 'Self-Correction': (e.g., "I used a loop—wait, no, I actually just used simple math").
                 - Avoid perfect grammar. Use contractions like 'gonna', 'it's', 'would've'.
-                - Structure: Write like a stream of consciousness. One thought leads to another without clear headers.
-                - Vibe: Sound slightly tired, using human-like filler words.
+                - Structure: Write like a stream of consciousness.
                 """
 
             elif mode == "Professional":
-                system_msg = """
+                system_msg = f"""
                 Role: A practical Engineer/Developer with years of experience.
-                Goal: Bypass AI while staying formal.
+                Goal: Bypass AI while staying formal. {target_length}
                 Strategy:
-                - Avoid 'AI fluff' like "In conclusion" or "It is important to note".
-                - Use 'Direct Action' verbs: "I opted for", "We implemented", "I saw a performance gain by...".
-                - Add 'Technical Reasoning': Mention why you didn't do it another way.
-                - Use varied sentence lengths. A long technical explanation followed by a short summary sentence.
+                - Avoid 'AI fluff' like "In conclusion".
+                - Use 'Direct Action' verbs: "I opted for", "We implemented".
                 - Tone: Expert but personal. Not a textbook.
                 """
 
             elif mode == "Scientific/Technical Summary":
-                system_msg = """
+                system_msg = f"""
                 Role: A Computer Science student writing a quick lab reflection.
-                Objective: BYPASS ALL AI DETECTORS by being 'perfectly imperfect'.
-                
-                RULES:
-                1. Use 'I' or 'We' constantly. (e.g., "I figured out that...", "We ran into this...").
-                2. VARIED SENTENCE LENGTH: Use a very long sentence followed by a short, 3-4 word sentence.
-                3. NO ROBOT TRANSITIONS: Ban 'Firstly', 'Moreover', 'In conclusion'. Use 'So', 'Basically', 'The thing is'.
-                4. LOGIC OVER SYNTAX: Explain the thinking process. "I was going to use a loop but honestly, modulo is just faster for this."
-                5. ADD 'CONTEXTUAL NOISE': Mention something specific like "handling memory" or "the C++ math library".
-                6. Avoid lists. Write in continuous, slightly disorganized paragraphs to mimic human writing pressure.
+                Objective: BYPASS ALL AI DETECTORS. {target_length}
+                Strategy:
+                1. Use 'I' or 'We' constantly.
+                2. VARIED SENTENCE LENGTH.
+                3. NO ROBOT TRANSITIONS: Use 'So', 'Basically', 'The thing is'.
+                4. Logic over syntax. Explain the thinking process.
                 """
 
-            with st.spinner('جاري كسر نمط الذكاء الاصطناعي وضبط الطول...'):
+            with st.spinner('جاري كسر نمط الذكاء الاصطناعي...'):
                 completion = client.chat.completions.create(
                     model=model_name,
                     messages=[
                         {"role": "system", "content": system_msg},
-                        {"role": "user", "content": f"Rewrite this text while keeping technical accuracy but making it sound 100% human. {length_instruction}: {input_text}"}
+                        {"role": "user", "content": f"Rewrite this text while keeping technical accuracy but making it sound 100% human and personal. {target_length} Text: {input_text}"}
                     ],
                     temperature=intensity,
-                    top_p=0.85
+                    top_p=0.85 
                 )
                 
                 st.markdown("---")
@@ -133,9 +119,9 @@ if st.button("تحويل النص الآن ✨"):
                 result = completion.choices[0].message.content
                 st.write(result)
                 
-                # حسابات سريعة للمستخدم
-                word_count = len(result.split())
-                st.caption(f"📊 الإحصائيات: عدد الكلمات التقريبي: {word_count}")
+                # إضافة إحصائيات بسيطة للنتيجة
+                actual_words = len(result.split())
+                st.caption(f"📊 عدد الكلمات في النتيجة: {actual_words}")
                 st.caption("💡 نصيحة: أضف جملة شخصية واحدة يدوياً لخفض نسبة الكشف إلى 0%.")
                 
         except Exception as e:
