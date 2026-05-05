@@ -36,33 +36,49 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 st.title("✨ AI Humanizer Elite Pro")
-st.write("أداة إيثان الخاصة لتحويل النصوص الأكاديمية إلى أسلوب بشري لا يمكن كشفه.")
+st.write("أداة إيثان الخاصة لتحويل النصوص إلى أسلوب بشري مع التحكم الكامل في الطول.")
 
 with st.sidebar:
     st.header("⚙️ الإعدادات التقنية")
     api_key = st.text_input("أدخل Groq API Key:", type="password")
     
-    # تم وضع الموديل الأصغر كخيار أول لأنه الأفضل في كسر الـ AI
     model_name = st.selectbox("النموذج (يفضل 8b للتقرير):", ["llama-3.1-8b-instant", "llama-3.3-70b-versatile"])
     
-    # اختيار نوع التقرير
     mode = st.radio("اختر وضع التعديل:", ["Creative", "Professional", "Scientific/Technical Summary"])
     
+    st.markdown("---")
+    st.header("📏 التحكم في الطول")
+    
+    # خيار لتحديد نوع القيد (كلمات أم جمل)
+    length_type = st.selectbox("القيد بناءً على:", ["عدد الكلمات", "عدد الجمل", "نفس طول النص الأصلي"])
+    
+    length_val = 0
+    if length_type != "نفس طول النص الأصلي":
+        length_val = st.number_input(f"أدخل {length_type} المطلوب:", min_value=10, max_value=2000, value=150)
+
     intensity = st.slider("قوة التحويل (Temperature):", 0.7, 1.5, 1.2)
     st.info("نصيحة: استخدم 1.2 للحصول على أقل نسبة كشف AI.")
 
-input_text = st.text_area("أدخل النص الأكاديمي أو المسودة هنا:", height=250, placeholder="ضع النص هنا...")
+input_text = st.text_area("أدخل النص الأصلي هنا:", height=250, placeholder="ضع النص هنا...")
 
 if st.button("تحويل النص الآن ✨"):
     if not api_key:
         st.error("الرجاء إدخال API Key.")
     elif not input_text:
-        st.warning("الرجاء إدخال نص.")
+        st.warning("الرجاء إدخل نص.")
     else:
         try:
             client = Groq(api_key=api_key)
             
-            # تحديد البرومبتس بناءً على استراتيجية كسر الأنماط
+            # إعداد رسالة القيد للطول
+            if length_type == "عدد الكلمات":
+                length_instruction = f"The output must be approximately {length_val} words long."
+            elif length_type == "عدد الجمل":
+                length_instruction = f"The output must consist of exactly or very close to {length_val} sentences."
+            else:
+                length_instruction = "Keep the output length similar to the original text."
+
+            # البرومبتس
             if mode == "Creative":
                 system_msg = """
                 Role: A university student (Ethan) talking casually.
@@ -101,15 +117,15 @@ if st.button("تحويل النص الآن ✨"):
                 6. Avoid lists. Write in continuous, slightly disorganized paragraphs to mimic human writing pressure.
                 """
 
-            with st.spinner('جاري كسر نمط الذكاء الاصطناعي...'):
+            with st.spinner('جاري كسر نمط الذكاء الاصطناعي وضبط الطول...'):
                 completion = client.chat.completions.create(
                     model=model_name,
                     messages=[
                         {"role": "system", "content": system_msg},
-                        {"role": "user", "content": f"Rewrite this text while keeping technical accuracy but making it sound 100% human and personal: {input_text}"}
+                        {"role": "user", "content": f"Rewrite this text while keeping technical accuracy but making it sound 100% human. {length_instruction}: {input_text}"}
                     ],
                     temperature=intensity,
-                    top_p=0.85 # تقليل top_p لزيادة العشوائية في اختيار الكلمات
+                    top_p=0.85
                 )
                 
                 st.markdown("---")
@@ -117,7 +133,9 @@ if st.button("تحويل النص الآن ✨"):
                 result = completion.choices[0].message.content
                 st.write(result)
                 
-                # إضافة نصيحة ذكية لإيثان أسفل النتيجة
+                # حسابات سريعة للمستخدم
+                word_count = len(result.split())
+                st.caption(f"📊 الإحصائيات: عدد الكلمات التقريبي: {word_count}")
                 st.caption("💡 نصيحة: أضف جملة شخصية واحدة يدوياً لخفض نسبة الكشف إلى 0%.")
                 
         except Exception as e:
